@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>案内ボード</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: #f0f8ff;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      text-align: center;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+    }
+
+    .slide.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .board {
+      background: #ffffff;
+      border: 1vw solid #6c63ff;
+      border-radius: 1vw;
+      box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.2);
+      padding: 2vw;
+      width: 95vw;
+      height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10vw;
+      line-height: 1.2;
+    }
+
+    .fullscreen-button {
+      position: fixed;
+      top: 1vw;
+      right: 1vw;
+      background: #6c63ff;
+      color: white;
+      border: none;
+      font-size: 3vw;
+      padding: 1vw 2vw;
+      border-radius: 1vw;
+      z-index: 1000;
+    }
+
+    .settings {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      border-top: 0.5vw solid #ccc;
+      padding: 2vw;
+      text-align: center;
+      font-size: 2.5vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2vw;
+    }
+
+    .settings input, .settings button {
+      font-size: 2.5vw;
+      padding: 1vw;
+      border-radius: 1vw;
+    }
+
+    #timeTextLine1 {
+      font-size: 9vw;
+      font-weight: bold;
+      color: #ff4500;
+      margin-bottom: 2vh;
+    }
+
+    #timeTextLine2 {
+      font-size: 8vw;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="fullscreen-button" onclick="toggleFullscreen()">全画面切替</button>
+
+  <div class="container">
+    <div class="slide active">
+      <div class="board">いらっしゃいませ！</div>
+    </div>
+    <div class="slide">
+      <div class="board">受付中</div>
+    </div>
+    <div class="slide">
+      <div class="board">ゲーム部会員証をご準備ください</div>
+    </div>
+    <div class="slide">
+      <div class="board" id="timeInfo">
+        <div>
+          <div id="timeTextLine1">15:00からのチケット</div>
+          <div id="timeTextLine2">受付できます</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings" id="settingsPanel">
+    <label for="startTime">開始時間：</label>
+    <input type="time" id="startTime" value="15:00">
+    <button onclick="updateTime()">更新</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+      });
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }
+
+    setInterval(nextSlide, 3000);
+
+    function updateTime() {
+      const time = document.getElementById("startTime").value;
+      document.getElementById("timeTextLine1").textContent = `${time}からのチケット`;
+      document.getElementById("timeTextLine2").textContent = `入場できます`;
+    }
+
+    function toggleFullscreen() {
+      const elem = document.documentElement;
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().then(() => {
+          document.getElementById("settingsPanel").style.display = "none";
+        });
+      } else {
+        document.exitFullscreen().then(() => {
+          document.getElementById("settingsPanel").style.display = "flex";
+        });
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const isFull = !!document.fullscreenElement;
+      document.getElementById("settingsPanel").style.display = isFull ? "none" : "flex";
+    });
+  </script>
+
+</body>
+</html>
